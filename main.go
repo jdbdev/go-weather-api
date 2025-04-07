@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -11,6 +12,10 @@ import (
 	"github.com/joho/godotenv"
 )
 
+
+type weatherData struct{
+	Name string
+}
 
 func main(){
 
@@ -52,12 +57,14 @@ response, err := http.Get(urlDemo)
 		fmt.Println()
 	}
 	defer response.Body.Close()
-	if response.StatusCode == 200 {
-		fmt.Println("HTTP status code 200")
+	if response.StatusCode != 200 {
+		log.Fatal("Something went wrong!")
 	}
-	
-	fmt.Println(response.Header)
 	fmt.Println("The HTTP status code is:", response.StatusCode)
-	fmt.Println("The HTTP Body is:", response.Body)
-
+	
+	body, err:= io.ReadAll(response.Body)
+	if err != nil{
+		log.Fatal("there is no response body")
+	}
+	fmt.Println(string(body))
 }

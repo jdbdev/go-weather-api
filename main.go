@@ -10,16 +10,21 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/jdbdev/go-weather-api/types"
+
 	"github.com/joho/godotenv"
 )
 
 // Global variables
-var apiKey string = ""
-var city string = ""
-var url string = ""
+var (
+	apiKey string = ""
+	city string = ""
+	url string = ""
+)
+
 
 // Load .env variables and check for API key:
-func loadEnv () (string, error){
+func loadEnv() (string, error){
 	err := godotenv.Load()
 	if err != nil{
 		log.Fatal("error loading .env file")
@@ -30,15 +35,15 @@ func loadEnv () (string, error){
 	}
 	return "success loading .env file!", nil
 }
-// Function prompts user for city name and updates value at variable city:
+// Function prompts user for city name and updates value at variable city
 func updateCity(str *string){
 	var userCity string
 	fmt.Println("Enter your city name:")
 	fmt.Scanln(&userCity) 
 	*str = userCity
 }
-// Build URL
-func buildURL(city, key string) string {
+// Build URL from latitude, longitued and api key
+func buildURL(lat, long, key string) string {
 	return ""
 }
 // Send HTTP Request to openweathermap.org
@@ -55,8 +60,20 @@ func sendRequest (x string) (string, error){
 	return string(body), nil
 }
 
+// Write .txt file from json data (string):
+func writeText(x string){
+	file, err := os.Create("sample.txt")
+	if err != nil{
+		fmt.Println(err)
+	} else{
+		file.WriteString(x)
+	}
+}
+
 
 func main(){
+	// load packages:
+	types.LoadTypes()
 	// load .env file and check for API key:
 	env, err := loadEnv()
 	fmt.Println(env, err)
@@ -64,14 +81,19 @@ func main(){
 		if apiKey == ""{
 			log.Fatal("Error: API_KEY has no assigned value")
 		}
+
 	// Prompt user for city: 
 	updateCity(&city) 
 	fmt.Printf("The weather in %s is:", city)
+
+	// Get latitude and Longitude for user city: 
 
 	// Build request URL: 
 	url = fmt.Sprintf("https://api.openweathermap.org/data/3.0/onecall?lat=33.44&lon=-94.04&exclude=hourly,daily&appid=%s", apiKey)
 
 	// send HTTP Request to openweathermap.org:
 	responseBody, _ := sendRequest(url)
-	fmt.Println(responseBody)
+
+	// write .txt file from response json data:
+	writeText(responseBody)
 }

@@ -43,7 +43,7 @@ func updateCity(str *string){
 	*str = userCity
 }
 
-// Build URL from latitude, longitued and api key
+// Build URL from latitude, longitude and api key
 func buildURL() string {
 	return ""
 }
@@ -75,6 +75,7 @@ func writeText(x string){
 func main(){
 	// load packages:
 	types.LoadTypes()
+
 	// load .env file and check for API key:
 	err := loadEnv()
 	if err != nil{

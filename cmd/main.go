@@ -2,6 +2,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -21,29 +22,32 @@ var (
 )
 
 
-// Load .env variables and check for API key:
-func loadEnv() (string, error){
+// loadEnv loads .env file and checks for required variables:
+func loadEnv() (error) {
 	err := godotenv.Load("../.env")
 	if err != nil{
-		log.Fatal("error loading .env file")
+		return errors.New("missing: required .env file not found")
 	}
 	apiKey:= os.Getenv("API_KEY")
 	if apiKey == ""{
-		log.Fatal("Error: API_KEY has no assigned value")
+		return errors.New("empty value: API_KEY has no assigned value")
 	}
-	return "success loading .env file!", nil
+	return nil
 }
-// Function prompts user for city name and updates value at variable city
+
+// updateCity prompts user for city name and updates value at variable city
 func updateCity(str *string){
 	var userCity string
 	fmt.Println("Enter your city name:")
 	fmt.Scanln(&userCity) 
 	*str = userCity
 }
+
 // Build URL from latitude, longitued and api key
-func buildURL(lat, long, key string) string {
+func buildURL() string {
 	return ""
 }
+
 // Send HTTP Request to openweathermap.org
 func sendRequest (x string) (string, error){
 	response, err := http.Get(x)
@@ -72,12 +76,10 @@ func main(){
 	// load packages:
 	types.LoadTypes()
 	// load .env file and check for API key:
-	env, err := loadEnv()
-	fmt.Println(env, err)
-	apiKey = os.Getenv("API_KEY")
-		if apiKey == ""{
-			log.Fatal("Error: API_KEY has no assigned value")
-		}
+	err := loadEnv()
+	if err != nil{
+		log.Fatal("Fatal error:", err)
+	}
 
 	// Prompt user for city: 
 	updateCity(&city) 

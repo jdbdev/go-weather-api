@@ -22,15 +22,17 @@ var (
 )
 
 
-// loadEnv loads .env file and checks for required variables:
-func loadEnv() (error) {
+// loadEnv loads .env file required variables, assigns API_KEY value to apiKey:
+func loadEnv(str *string) (error) {
 	err := godotenv.Load("../.env")
 	if err != nil{
 		return errors.New("missing: required .env file not found")
 	}
-	apiKey:= os.Getenv("API_KEY")
-	if apiKey == ""{
+	key:= os.Getenv("API_KEY")
+	if key == ""{
 		return errors.New("empty value: API_KEY has no assigned value")
+	}else{
+		*str = key
 	}
 	return nil
 }
@@ -77,11 +79,11 @@ func main(){
 	types.LoadTypes()
 
 	// load .env file and check for API key:
-	err := loadEnv()
+	err := loadEnv(&apiKey)
 	if err != nil{
 		log.Fatal("Fatal error:", err)
 	}
-
+	
 	// Prompt user for city: 
 	updateCity(&city) 
 	fmt.Printf("The weather in %s is:", city)
@@ -93,7 +95,8 @@ func main(){
 
 	// send HTTP Request to openweathermap.org:
 	responseBody, _ := sendRequest(url)
+	fmt.Println(responseBody)
 
-	// write .txt file from response json data:
-	writeText(responseBody)
+	// // write .txt file from response json data:
+	// writeText(responseBody)
 }

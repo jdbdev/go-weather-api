@@ -23,6 +23,27 @@ var (
 	coordinates string = ""
 )
 
+type Location struct {
+	CityName 		string
+	CountryCode 	string 
+	Coordinates 
+}
+
+type Coordinates struct {
+	Latitude string
+	Longitude string
+}
+
+func (l *Location) setLocationFields() {
+	var inputName string
+	var inputCode string
+	fmt.Println("Enter city name:")
+	fmt.Scanln(&inputName)
+	fmt.Println("Enter two letter country code (Canada = CA):")
+	fmt.Scanln(&inputCode)
+	l.CityName = inputName
+	l.CountryCode = inputCode
+}
 
 // loadEnv loads .env file required variables, assigns API_KEY value to apiKey:
 func loadEnv(str *string) (error) {
@@ -53,7 +74,7 @@ func inputCountryCode(str *string) error{
 	fmt.Println("enter your country code (ISO 2 letter code. Example: Canada = CA)")
 	fmt.Scanln(&inputCountryCode)
 	*str = inputCountryCode
-	return errors.New("error: country code must be 2 letters long")
+	// return errors.New("error: country code must be 2 letters long")
 }
 
 // Build URL from latitude, longitude and api key

@@ -9,37 +9,29 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/jdbdev/go-weather-api/types"
-
 	"github.com/joho/godotenv"
 )
 
 // Global variables
 var (
 	apiKey string = ""
-	city string = ""
 	url string = ""
-	countryCode string = ""
-	coordinates string = ""
 )
 
 type Location struct {
 	CityName 		string
 	CountryCode 	string 
-	Coordinates 
+	Latitude 		string
+	Longitude 		string
 }
 
-type Coordinates struct {
-	Latitude string
-	Longitude string
-}
 
 func (l *Location) setLocationFields() {
 	var inputName string
 	var inputCode string
 	fmt.Println("Enter city name:")
 	fmt.Scanln(&inputName)
-	fmt.Println("Enter two letter country code (Canada = CA):")
+	fmt.Println("Enter two letter country code (example: Canada = CA):")
 	fmt.Scanln(&inputCode)
 	l.CityName = inputName
 	l.CountryCode = inputCode
@@ -74,7 +66,7 @@ func inputCountryCode(str *string) error{
 	fmt.Println("enter your country code (ISO 2 letter code. Example: Canada = CA)")
 	fmt.Scanln(&inputCountryCode)
 	*str = inputCountryCode
-	// return errors.New("error: country code must be 2 letters long")
+	return errors.New("error: country code must be 2 letters long")
 }
 
 // Build URL from latitude, longitude and api key
@@ -107,33 +99,29 @@ func writeText(x string){
 }
 
 func main(){
-	// load packages:
-	types.LoadTypes()
 
-	// load .env file and check for API key:
+	// 01 load .env file and check for API key:
 	err := loadEnv(&apiKey)
 	if err != nil{
 		log.Fatal("Fatal error:", err)
 	}
 	
-	// Prompt user for city: 
-	inputCity(&city) 
-	err = inputCountryCode(&countryCode)
-	if err != nil{
-		log.Println(err)
-	}
-	fmt.Printf("The weather in %s (%s)is:", city, countryCode)
+	// 02 Build location data from user input and API call:
+	city := Location{"","","",""} // instantiate empty Location struct 
+	city.setLocationFields() 
+	fmt.Println(city.CityName)
+	fmt.Println(city.CountryCode)
 
-	// Get latitude and Longitude for user city: 
-	urlDirect = fmt.Sprintf("http://api.openweathermap.org/geo/1.0/direct?q={city name},{state code},{country code}&limit={limit}&appid=%s", apiKey)
+	// // Get latitude and Longitude for user city: 
+	// urlDirect = fmt.Sprintf("http://api.openweathermap.org/geo/1.0/direct?q={city name},{state code},{country code}&limit={limit}&appid=%s", apiKey)
 
-	// Build request URL: 
-	url = fmt.Sprintf("https://api.openweathermap.org/data/3.0/onecall?lat=33.44&lon=-94.04&exclude=hourly,daily&appid=%s", apiKey)
+	// // Build request URL: 
+	// url = fmt.Sprintf("https://api.openweathermap.org/data/3.0/onecall?lat=33.44&lon=-94.04&exclude=hourly,daily&appid=%s", apiKey)
 
-	// send HTTP Request to openweathermap.org:
-	responseBody, _ := sendRequest(url)
-	fmt.Println(responseBody)
+	// // send HTTP Request to openweathermap.org:
+	// responseBody, _ := sendRequest(url)
+	// fmt.Println(responseBody)
 
-	// write .txt file from response json data:
-	writeText(responseBody)
+	// // write .txt file from response json data:
+	// writeText(responseBody)
 }

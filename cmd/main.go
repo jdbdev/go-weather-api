@@ -19,6 +19,8 @@ var (
 	apiKey string = ""
 	city string = ""
 	url string = ""
+	countryCode string = ""
+	coordinates string = ""
 )
 
 
@@ -37,12 +39,21 @@ func loadEnv(str *string) (error) {
 	return nil
 }
 
-// updateCity prompts user for city name and updates value at variable city
-func updateCity(str *string){
-	var userCity string
-	fmt.Println("Enter your city name:")
-	fmt.Scanln(&userCity) 
-	*str = userCity
+// inputCity prompts user for city name and updates value at variable city
+func inputCity(str *string){
+	var inputCity string
+	fmt.Println("enter your city name:")
+	fmt.Scanln(&inputCity) 
+	*str = inputCity
+}
+
+// inputCountryCode prompts user for ISO 3166 Country code (2 letters)
+func inputCountryCode(str *string) error{
+	var inputCountryCode string
+	fmt.Println("enter your country code (ISO 2 letter code. Example: Canada = CA)")
+	fmt.Scanln(&inputCountryCode)
+	*str = inputCountryCode
+	return errors.New("error: country code must be 2 letters long")
 }
 
 // Build URL from latitude, longitude and api key
@@ -85,10 +96,15 @@ func main(){
 	}
 	
 	// Prompt user for city: 
-	updateCity(&city) 
-	fmt.Printf("The weather in %s is:", city)
+	inputCity(&city) 
+	err = inputCountryCode(&countryCode)
+	if err != nil{
+		log.Println(err)
+	}
+	fmt.Printf("The weather in %s (%s)is:", city, countryCode)
 
 	// Get latitude and Longitude for user city: 
+	urlDirect = fmt.Sprintf("http://api.openweathermap.org/geo/1.0/direct?q={city name},{state code},{country code}&limit={limit}&appid=%s", apiKey)
 
 	// Build request URL: 
 	url = fmt.Sprintf("https://api.openweathermap.org/data/3.0/onecall?lat=33.44&lon=-94.04&exclude=hourly,daily&appid=%s", apiKey)
@@ -97,6 +113,6 @@ func main(){
 	responseBody, _ := sendRequest(url)
 	fmt.Println(responseBody)
 
-	// // write .txt file from response json data:
-	// writeText(responseBody)
+	// write .txt file from response json data:
+	writeText(responseBody)
 }
